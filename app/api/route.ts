@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     console.time(
         "text completion " + request.headers.get("x-vercel-id") || "local"
     );
-
+    //@ts-ignore
     const completion = await groq.chat.completions.create({
         model: "llama3-8b-8192",
         messages: [
