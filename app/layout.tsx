@@ -7,7 +7,7 @@ import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
-    title: "Linguo",
+    title: "echoAI",
     description:
         "A fast, knowledgable language assistant powered by Groq, Cartesia, and Vercel.",
 };

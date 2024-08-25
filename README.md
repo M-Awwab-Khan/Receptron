@@ -1,6 +1,6 @@
-# [Linguo](https://linguo-ai.vercel.app)
+# [echoAI](https://echoAI-ai.vercel.app)
 
-Linguo is a fast AI voice assistant.
+echoAI is a fast AI voice assistant.
 
 -   [Groq](https://groq.com) is used for fast inference of [OpenAI Whisper](https://github.com/openai/whisper) (for transcription) and [Meta Llama 3](https://llama.meta.com/llama3/) (for generating the text response).
 -   [Deepgram](https://deepgram.com)'s asteria model is used for fast speech synthesis, which is streamed to the frontend.
