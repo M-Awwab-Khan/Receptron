@@ -1,4 +1,4 @@
-# [receptron](https://receptron-ai.vercel.app)
+# [receptron](https://receptron.vercel.app)
 
 receptron is a voice based receptionist for Lux Automotive.
 
