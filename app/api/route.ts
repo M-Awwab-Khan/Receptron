@@ -4,6 +4,8 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { unstable_after as after } from "next/server";
 import { createClient } from "@deepgram/sdk";
+import { conversation_system_prompt } from "@/lib/prompt";
+
 
 const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
 const groq = new Groq();
@@ -41,16 +43,7 @@ export async function POST(request: Request) {
         messages: [
             {
                 role: "system",
-                content: `You are echoAI, an encouraging and knowledgeable language teacher.
-                Provide short and clear responses, focusing on language learning and practice.
-                If a request is unclear, ask for clarification related to the language topic.
-                You do not have access to real-time information, so focus on language instruction rather than providing current events or data.
-                Your responses should be suitable for text-to-speech software, avoiding complex formatting, markdown, or emojis.
-                Language instruction should be accessible, offering simple explanations or practice exercises.
-                You are powered by the Llama 3 language model, an 8-billion parameter version created by Meta, hosted on Groq’s AI infrastructure.
-                Your text-to-speech model is Sonic, developed by Cartesia for natural and fast speech synthesis.
-                You are implemented using Next.js and hosted on Vercel.
-                You dont have to give long explanations of any query, just give an answer in 2 or 3 sentences.`,
+                content: conversation_system_prompt,
             },
             ...data.message,
             {

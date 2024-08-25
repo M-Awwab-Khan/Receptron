@@ -7,6 +7,7 @@ import { EnterIcon, LoadingIcon } from "@/lib/icons";
 import { usePlayer } from "@/lib/usePlayer";
 import { track } from "@vercel/analytics";
 import { useMicVAD, utils } from "@ricky0123/vad-react";
+import { Button } from "./components/ui/button";
 
 type Message = {
     role: "user" | "assistant";
@@ -20,7 +21,7 @@ export default function Home() {
     const player = usePlayer();
 
     const vad = useMicVAD({
-        startOnLoad: true,
+        startOnLoad: false,
         onSpeechEnd: (audio) => {
             player.stop();
             const wav = utils.encodeWAV(audio);
@@ -60,6 +61,10 @@ export default function Home() {
         window.addEventListener("keydown", keyDown);
         return () => window.removeEventListener("keydown", keyDown);
     });
+
+    useEffect(() => {
+        vad.pause()
+    }, [])
 
     const [messages, submit, isPending] = useActionState<
         Array<Message>,
@@ -129,6 +134,55 @@ export default function Home() {
         submit(input);
     }
 
+    const compileTranscript = () => {
+        let transcript = messages.map(message =>
+            `${message.role === 'user' ? 'Customer: ' : 'Receptionist: '}${message.content}`
+        ).join('\n');
+
+        return transcript;
+    };
+
+    async function endCall() {
+        //submit transript to end point /api/end
+        const transcript = compileTranscript();
+        const response = await fetch('/api/end', {
+            method: "POST",
+            body: JSON.stringify({ transcript: transcript })
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const jsonResponse = await response.json()
+        console.log(jsonResponse)
+        sendEmail(jsonResponse)
+
+    }
+
+    async function sendEmail(jsonResponse) {
+        const response = await fetch('/api/send', {
+            method: "POST",
+            body: JSON.stringify(jsonResponse)
+        })
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        console.log('sent')
+    }
+
+
+    function toggleCall() {
+        if (vad.listening) {
+            vad.pause()
+            endCall()
+        }
+        else {
+            vad.start()
+        }
+    }
+
     return (
         <>
             <div className="pb-4 min-h-28" />
@@ -171,9 +225,9 @@ export default function Home() {
                 {messages.length === 0 && (
                     <>
                         <p>
-                            A fast, knowledgable AI language assistant powered by{" "}
+                            A fast, knowledgable Voice Call Agent for Lux Automotive powered by{" "}
                             <A href="https://groq.com">Groq</A>,{" "}
-                            <A href="https://cartesia.ai">Cartesia</A>,{" "}
+                            <A href="https://deepgram.com">Deepgram</A>,{" "}
                             <A href="https://www.vad.ricky0123.com/">VAD</A>,
                             and <A href="https://vercel.com">Vercel</A>.{" "}
                             <A
@@ -190,10 +244,12 @@ export default function Home() {
                         ) : vad.errored ? (
                             <p>Failed to load speech detection.</p>
                         ) : (
-                            <p>Start talking to chat.</p>
+                            <p>Click the button below to start the call.</p>
                         )}
                     </>
                 )}
+
+                <Button variant="default" className="rounded-full" onClick={toggleCall}>{vad.listening ? "End Call" : "Start Call"}</Button>
             </div>
 
             <div
